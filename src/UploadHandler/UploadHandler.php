@@ -16,6 +16,7 @@ class UploadHandler {
     public $chunksCleanupProbability = 0.001; // Once in 1000 requests on avg
     public $chunksExpireIn = 604800; // One week
     protected $uploadName;
+    protected $type;
 
     /**
      * Get the original filename
@@ -26,6 +27,15 @@ class UploadHandler {
 
         if (isset($_FILES[$this->inputName]))
             return $_FILES[$this->inputName]['name'];
+    }
+
+    /**
+     * Get the original type
+     */
+    public function getType() {
+        if (isset($_FILES[$this->inputName])) {
+            return $_FILES[$this->inputName]['type'];
+        }
     }
 
     public function getInitialFiles() {
@@ -45,6 +55,13 @@ class UploadHandler {
         return $this->uploadName;
     }
 
+    /**
+     * Get the type of the uploaded file
+     */
+    public function getUploadType() {
+        return $this->type;
+    }
+
     public function combineChunks($uploadDirectory, $name = null) {
         $uuid = $_POST['qquuid'];
         if ($name === null) {
@@ -55,7 +72,7 @@ class UploadHandler {
 
         $targetPath = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $uuid, $name));
         $this->uploadName = $name;
-
+        $this->type = $this->getType();
         if (!file_exists($targetPath)) {
             mkdir(dirname($targetPath), 0777, true);
         }
@@ -125,6 +142,7 @@ class UploadHandler {
         // Get size and name
         $file = $_FILES[$this->inputName];
         $size = $file['size'];
+        $this->type = $this->getType();
         if (isset($_REQUEST['qqtotalfilesize'])) {
             $size = $_REQUEST['qqtotalfilesize'];
         }
