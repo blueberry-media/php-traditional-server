@@ -1,14 +1,14 @@
 {
-    "name": "ne0bot/php-traditional-server",
+    "autoload": {
+        "files": [ "UploadHandler.php" ]
+    },
     "description": "Endpoint handler for Fine Uploader's traditional server requests.",
-    "homepage": "http://fineuploader.com",
     "license": "MIT",
+    "name": "ne0bot/php-traditional-server",
+    "homepage": "http://fineuploader.com",
     "require": {
         "php": ">=5.6"        
     },
-    "autoload": {
-        "psr-4": {
-            "UploadHandler\\": "src/UploadHandler/"
-        }
-    }
+    "type": "library"
 }
+
