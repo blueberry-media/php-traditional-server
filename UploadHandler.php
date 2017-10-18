@@ -15,8 +15,13 @@ class UploadHandler {
     public $chunksFolder = 'chunks';
     public $chunksCleanupProbability = 0.001; // Once in 1000 requests on avg
     public $chunksExpireIn = 604800; // One week
+    public $totalparts = 1;
     protected $uploadName;
     protected $type;
+
+    public function __construct() {
+        $this->totalParts = isset($_REQUEST['qqtotalparts']) ? (int) $_REQUEST['qqtotalparts'] : 1;
+    }
 
     /**
      * Get the original filename
@@ -40,11 +45,9 @@ class UploadHandler {
 
     public function getInitialFiles() {
         $initialFiles = array();
-
         for ($i = 0; $i < 5000; $i++) {
             array_push($initialFiles, array("name" => "name" + $i, uuid => "uuid" + $i, thumbnailUrl => "/test/dev/handlers/vendor/fineuploader/php-traditional-server/fu.png"));
         }
-
         return $initialFiles;
     }
 
@@ -68,7 +71,7 @@ class UploadHandler {
             $name = $this->getName();
         }
         $targetFolder = $this->chunksFolder . DIRECTORY_SEPARATOR . $uuid;
-        $totalParts = isset($_REQUEST['qqtotalparts']) ? (int) $_REQUEST['qqtotalparts'] : 1;
+
 
         $targetPath = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $uuid, $name));
         $this->uploadName = $name;
@@ -78,7 +81,7 @@ class UploadHandler {
         }
         $target = fopen($targetPath, 'wb');
 
-        for ($i = 0; $i < $totalParts; $i++) {
+        for ($i = 0; $i < $this->totalParts; $i++) {
             $chunk = fopen($targetFolder . DIRECTORY_SEPARATOR . $i, "rb");
             stream_copy_to_stream($chunk, $target);
             fclose($chunk);
@@ -87,7 +90,7 @@ class UploadHandler {
         // Success
         fclose($target);
 
-        for ($i = 0; $i < $totalParts; $i++) {
+        for ($i = 0; $i < $this->totalParts; $i++) {
             unlink($targetFolder . DIRECTORY_SEPARATOR . $i);
         }
 
@@ -180,10 +183,10 @@ class UploadHandler {
         }
 
         // Save a chunk
-        $totalParts = isset($_REQUEST['qqtotalparts']) ? (int) $_REQUEST['qqtotalparts'] : 1;
+
 
         $uuid = $_REQUEST['qquuid'];
-        if ($totalParts > 1) {
+        if ($this->totalParts > 1) {
             # chunked upload
 
             $chunksFolder = $this->chunksFolder;
