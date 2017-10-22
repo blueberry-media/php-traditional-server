@@ -15,7 +15,7 @@ class UploadHandler {
     public $chunksFolder = 'chunks';
     public $chunksCleanupProbability = 0.001; // Once in 1000 requests on avg
     public $chunksExpireIn = 604800; // One week
-    public $totalparts = 1;
+    public $totalParts = 1;
     protected $uploadName;
     protected $type;
 
@@ -66,13 +66,14 @@ class UploadHandler {
     }
 
     public function combineChunks($uploadDirectory, $name = null) {
+        set_time_limit(120);
         $uuid = $_POST['qquuid'];
         if ($name === null) {
             $name = $this->getName();
         }
         $targetFolder = $this->chunksFolder . DIRECTORY_SEPARATOR . $uuid;
 
-
+        $this->totalParts = isset($_REQUEST['qqtotalparts']) ? (int) $_REQUEST['qqtotalparts'] : 1;
         $targetPath = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $uuid, $name));
         $this->uploadName = $name;
         $this->type = $this->getType();
@@ -184,7 +185,7 @@ class UploadHandler {
 
         // Save a chunk
 
-
+        $this->totalParts = isset($_REQUEST['qqtotalparts']) ? (int) $_REQUEST['qqtotalparts'] : 1;
         $uuid = $_REQUEST['qquuid'];
         if ($this->totalParts > 1) {
             # chunked upload
