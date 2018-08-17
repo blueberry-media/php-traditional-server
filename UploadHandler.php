@@ -79,6 +79,7 @@ class UploadHandler {
         $this->type = $this->getType();
         if (!file_exists($targetPath)) {
             mkdir(dirname($targetPath), 0777, true);
+			@chmod(dirname($targetPath),0777);
         }
         $target = fopen($targetPath, 'wb');
 
@@ -90,6 +91,7 @@ class UploadHandler {
 
         // Success
         fclose($target);
+		@chmod($targetPath,0777);
 
         for ($i = 0; $i < $this->totalParts; $i++) {
             unlink($targetFolder . DIRECTORY_SEPARATOR . $i);
@@ -103,7 +105,7 @@ class UploadHandler {
             return array("success" => false, "uuid" => $uuid, "preventRetry" => true);
         }
 
-        return array("success" => true, "uuid" => $uuid);
+		return array('success' => true, "uuid" => $uuid, 'status' =>'complete');
     }
 
     /**
@@ -201,12 +203,14 @@ class UploadHandler {
 
             if (!file_exists($targetFolder)) {
                 mkdir($targetFolder, 0777, true);
+				@chmod($targetFolder,0777);
             }
 
             $target = $targetFolder . '/' . $partIndex;
             $success = move_uploaded_file($_FILES[$this->inputName]['tmp_name'], $target);
+			@chmod($target,0777);
 
-            return array("success" => true, "uuid" => $uuid);
+            return array("success" => true, "uuid" => $uuid, 'status' =>'chunk');
         } else {
             # non-chunked upload
 
@@ -217,9 +221,11 @@ class UploadHandler {
 
                 if (!is_dir(dirname($target))) {
                     mkdir(dirname($target), 0777, true);
+					@chmod(dirname($target),0777);
                 }
                 if (move_uploaded_file($file['tmp_name'], $target)) {
-                    return array('success' => true, "uuid" => $uuid);
+					@chmod($target,0777);
+                    return array('success' => true, "uuid" => $uuid, 'status' =>'complete');
                 }
             }
 
