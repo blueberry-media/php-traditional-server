@@ -4,7 +4,7 @@
     },
     "description": "Endpoint handler for Fine Uploader's traditional server requests.",
     "license": "MIT",
-    "name": "ne0bot/php-traditional-server",
+    "name": "blueberry-media/php-traditional-server",
     "homepage": "http://fineuploader.com",
     "require": {
         "php": ">=5.6"        
